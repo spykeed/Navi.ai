@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="description"
+    content="Nova AI — Create images from your imagination."
+  >
+
+  <title>Nova AI — Image Generator</title>
+
+  <style>
+    :root {
+      --bg: #070711;
+      --panel: rgba(18, 18, 34, .82);
+      --border: rgba(255,255,255,.09);
+      --text: #f8f8ff;
+      --muted: #9090a8;
+      --purple: #8b5cf6;
+      --pink: #ec4899;
+      --green: #34d399;
+      --red: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background:
+        radial-gradient(
+          circle at 15% 10%,
+          rgba(139,92,246,.18),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 85% 20%,
+          rgba(236,72,153,.12),
+          transparent 28%
+        ),
+        #070711;
+    }
+
+    button,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    header {
+      height: 74px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7,7,17,.78);
+      backdrop-filter: blur(20px);
+    }
+
+    .nav {
+      width: min(1180px, calc(100% - 32px));
+      height: 100%;
+      margin: auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      color: white;
+      text-decoration: none;
+
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 12px;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--purple),
+          var(--pink)
+        );
+
+      box-shadow:
+        0 8px 30px rgba(139,92,246,.3);
+    }
+
+    .credits {
+      padding: 9px 13px;
+
+      border: 1px solid var(--border);
+      border-radius: 12px;
+
+      background: rgba(255,255,255,.04);
+
+      color: #ddd;
+      font-size: 12px;
+    }
+
+    .credit-dot {
+      display: inline-block;
+
+      width: 7px;
+      height: 7px;
+
+      margin-right: 7px;
+
+      border-radius: 50%;
+
+      background: var(--green);
+
+      box-shadow:
+        0 0 12px var(--green);
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+
+      margin: auto;
+
+      padding: 70px 0 90px;
+    }
+
+    .hero {
+      max-width: 780px;
+
+      margin: 0 auto 48px;
+
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+
+      margin-bottom: 20px;
+
+      padding: 8px 14px;
+
+      border:
+        1px solid
+        rgba(167,139,250,.25);
+
+      border-radius: 999px;
+
+      color: #c4b5fd;
+
+      background:
+        rgba(139,92,246,.08);
+
+      font-size: 11px;
+      font-weight: 800;
+
+      letter-spacing: .5px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+
+      font-size:
+        clamp(45px, 7vw, 78px);
+
+      line-height: .98;
+
+      letter-spacing: -4px;
+
+      background:
+        linear-gradient(
+          100deg,
+          #fff,
+          #c4b5fd,
+          #f9a8d4,
+          #fff
+        );
+
+      background-size: 250% auto;
+
+      color: transparent;
+
+      background-clip: text;
+      -webkit-background-clip: text;
+
+      animation:
+        shine 6s linear infinite;
+    }
+
+    @keyframes shine {
+      to {
+        background-position:
+          250% center;
+      }
+    }
+
+    .hero p {
+      color: var(--muted);
+
+      line-height: 1.7;
+
+      font-size: 16px;
+    }
+
+    .generator {
+      display: grid;
+
+      grid-template-columns:
+        380px 1fr;
+
+      gap: 18px;
+    }
+
+    .panel {
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 22px;
+
+      background:
+        var(--panel);
+
+      backdrop-filter:
+        blur(25px);
+
+      box-shadow:
+        0 25px 70px
+        rgba(0,0,0,.35);
+    }
+
+    .controls {
+      padding: 24px;
+    }
+
+    .label-row {
+      display: flex;
+
+      justify-content:
+        space-between;
+
+      margin-bottom: 10px;
+
+      color: #d6d6e8;
+
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    textarea {
+      width: 100%;
+
+      min-height: 170px;
+
+      resize: vertical;
+
+      padding: 15px;
+
+      outline: none;
+
+      color: white;
+
+      background:
+        rgba(0,0,0,.22);
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 15px;
+
+      line-height: 1.6;
+    }
+
+    textarea:focus,
+    select:focus {
+      border-color:
+        rgba(139,92,246,.7);
+
+      box-shadow:
+        0 0 0 4px
+        rgba(139,92,246,.08);
+    }
+
+    textarea::placeholder {
+      color: #68687d;
+    }
+
+    .quick {
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 7px;
+
+      margin-top: 9px;
+    }
+
+    .quick button {
+      padding: 7px 9px;
+
+      color: #a4a4b9;
+
+      background:
+        rgba(255,255,255,.035);
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 9px;
+
+      font-size: 10px;
+    }
+
+    .quick button:hover {
+      color: white;
+
+      border-color:
+        rgba(139,92,246,.5);
+    }
+
+    .settings {
+      margin-top: 22px;
+
+      display: grid;
+
+      gap: 17px;
+    }
+
+    .settings-grid {
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 10px;
+    }
+
+    select {
+      width: 100%;
+
+      padding: 11px;
+
+      outline: none;
+
+      color: white;
+
+      background: #111120;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 11px;
+
+      font-size: 12px;
+    }
+
+    .ratios {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 7px;
+    }
+
+    .ratio {
+      padding: 9px 3px;
+
+      color: #85859b;
+
+      background:
+        rgba(255,255,255,.025);
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 10px;
+
+      font-size: 10px;
+    }
+
+    .ratio.active {
+      color: white;
+
+      border-color:
+        var(--purple);
+
+      background:
+        rgba(139,92,246,.13);
+    }
+
+    .ratio-shape {
+      display: block;
+
+      margin: 0 auto 6px;
+
+      border:
+        1px solid
+        currentColor;
+
+      border-radius: 2px;
+    }
+
+    .square {
+      width: 18px;
+      height: 18px;
+    }
+
+    .wide {
+      width: 25px;
+      height: 17px;
+    }
+
+    .tall {
+      width: 17px;
+      height: 25px;
+    }
+
+    .ultrawide {
+      width: 27px;
+      height: 14px;
+    }
+
+    .generate {
+      width: 100%;
+
+      margin-top: 23px;
+
+      padding: 15px;
+
+      border: 0;
+
+      border-radius: 14px;
+
+      color: white;
+
+      font-weight: 800;
+
+      background:
+        linear-gradient(
+          110deg,
+          #7c3aed,
+          #a855f7,
+          #ec4899
+        );
+
+      box-shadow:
+        0 12px 35px
+        rgba(139,92,246,.28);
+
+      transition: .2s;
+    }
+
+    .generate:hover {
+      transform:
+        translateY(-2px);
+
+      box-shadow:
+        0 17px 45px
+        rgba(139,92,246,.4);
+    }
+
+    .generate:disabled {
+      opacity: .6;
+
+      cursor: wait;
+
+      transform: none;
+    }
+
+    .preview {
+      min-height: 620px;
+
+      padding: 18px;
+    }
+
+    .preview-header {
+      display: flex;
+
+      align-items: center;
+
+      justify-content:
+        space-between;
+
+      padding:
+        4px 5px 15px;
+    }
+
+    .preview-header h2 {
+      font-size: 14px;
+    }
+
+    .status {
+      display: flex;
+
+      align-items: center;
+
+      gap: 7px;
+
+      color: #77778c;
+
+      font-size: 10px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+
+      border-radius: 50%;
+
+      background: #444456;
+    }
+
+    .canvas {
+      min-height: 550px;
+
+      height:
+        calc(100% - 40px);
+
+      overflow: hidden;
+
+      display: grid;
+
+      place-items: center;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 16px;
+
+      background:
+        radial-gradient(
+          circle at center,
+          rgba(139,92,246,.08),
+          transparent 35%
+        ),
+        #090914;
+
+      position: relative;
+    }
+
+    .empty {
+      max-width: 310px;
+
+      padding: 30px;
+
+      text-align: center;
+
+      color: #6c6c81;
+    }
+
+    .empty-icon {
+      width: 65px;
+      height: 65px;
+
+      margin:
+        0 auto 17px;
+
+      display: grid;
+
+      place-items: center;
+
+      border-radius: 20px;
+
+      color: #a78bfa;
+
+      background:
+        rgba(139,92,246,.07);
+
+      border:
+        1px solid
+        rgba(167,139,250,.18);
+
+      font-size: 27px;
+    }
+
+    .empty h3 {
+      margin-bottom: 7px;
+
+      color: #bcbcd0;
+
+      font-size: 14px;
+    }
+
+    .empty p {
+      font-size: 12px;
+
+      line-height: 1.6;
+    }
+
+    .loader {
+      display: none;
+
+      text-align: center;
+    }
+
+    .loader.active {
+      display: block;
+    }
+
+    .loader-circle {
+      width: 70px;
+      height: 70px;
+
+      margin:
+        0 auto 18px;
+
+      border:
+        4px solid
+        rgba(255,255,255,.08);
+
+      border-top-color:
+        var(--purple);
+
+      border-right-color:
+        var(--pink);
+
+      border-radius: 50%;
+
+      animation:
+        spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform:
+          rotate(360deg);
+      }
+    }
+
+    .loader h3 {
+      font-size: 14px;
+
+      margin-bottom: 6px;
+    }
+
+    .loader p {
+      color: #6d6d82;
+
+      font-size: 11px;
+    }
+
+    .result {
+      width: 100%;
+      height: 100%;
+
+      min-height: 550px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 14px;
+
+      padding: 15px;
+    }
+
+    .generated {
+      max-width: 100%;
+      max-height: 500px;
+
+      width: auto;
+      height: auto;
+
+      object-fit: contain;
+
+      border-radius: 12px;
+
+      animation:
+        imageIn .5s ease;
+    }
+
+    @keyframes imageIn {
+      from {
+        opacity: 0;
+        transform:
+          scale(.97);
+      }
+
+      to {
+        opacity: 1;
+        transform:
+          scale(1);
+      }
+    }
+
+    .download {
+      padding: 10px 17px;
+
+      border: 0;
+
+      border-radius: 10px;
+
+      color: white;
+
+      background:
+        linear-gradient(
+          110deg,
+          #7c3aed,
+          #ec4899
+        );
+
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .download:hover {
+      transform:
+        translateY(-1px);
+    }
+
+    .gallery-section {
+      margin-top: 75px;
+    }
+
+    .section-title {
+      margin-bottom: 20px;
+    }
+
+    .section-title h2 {
+      font-size: 25px;
+
+      letter-spacing: -1px;
+    }
+
+    .section-title p {
+      margin-top: 5px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+    }
+
+    .gallery {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 14px;
+    }
+
+    .gallery-card {
+      position: relative;
+
+      aspect-ratio: 1;
+
+      overflow: hidden;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 15px;
+
+      background: #11111f;
+
+      cursor: pointer;
+    }
+
+    .gallery-card img {
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+
+      transition: .35s;
+    }
+
+    .gallery-card:hover img {
+      transform:
+        scale(1.06);
+    }
+
+    .gallery-card span {
+      position: absolute;
+
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      padding:
+        35px 12px 12px;
+
+      background:
+        linear-gradient(
+          transparent,
+          rgba(0,0,0,.85)
+        );
+
+      font-size: 10px;
+
+      opacity: 0;
+
+      transition: .2s;
+    }
+
+    .gallery-card:hover span {
+      opacity: 1;
+    }
+
+    footer {
+      padding: 30px;
+
+      text-align: center;
+
+      color: #5e5e72;
+
+      border-top:
+        1px solid
+        var(--border);
+
+      font-size: 11px;
+    }
+
+    .toast {
+      position: fixed;
+
+      left: 50%;
+      bottom: 25px;
+
+      z-index: 100;
+
+      padding: 12px 17px;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius: 12px;
+
+      background:
+        rgba(20,20,34,.95);
+
+      color: white;
+
+      font-size: 12px;
+
+      transform:
+        translate(-50%, 100px);
+
+      opacity: 0;
+
+      transition: .3s;
+    }
+
+    .toast.show {
+      opacity: 1;
+
+      transform:
+        translate(-50%, 0);
+    }
+
+    @media (max-width: 850px) {
+      .generator {
+        grid-template-columns:
+          1fr;
+      }
+
+      .gallery {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 550px) {
+      main {
+        padding-top: 45px;
+      }
+
+      h1 {
+        letter-spacing: -2.5px;
+      }
+
+      .settings-grid {
+        grid-template-columns:
+          1fr;
+      }
+
+      .canvas {
+        min-height: 400px;
+      }
+
+      .result {
+        min-height: 400px;
+      }
+
+      .gallery {
+        gap: 9px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <nav class="nav">
+
+    <a class="logo" href="/">
+      <span class="logo-icon">✦</span>
+      Nova AI
+    </a>
+
+    <div class="credits">
+      <span class="credit-dot"></span>
+      <span id="credits">24</span>
+      credits
+    </div>
+
+  </nav>
+</header>
+
+
+<main>
+
+  <section class="hero">
+
+    <div class="badge">
+      ✦ AI IMAGE GENERATOR
+    </div>
+
+    <h1>
+      Turn imagination<br>
+      into pixels.
+    </h1>
+
+    <p>
+      Describe anything you can imagine and Nova AI
+      will transform your words into an original image.
+    </p>
+
+  </section>
+
+
+  <section class="generator">
+
+    <!-- CONTROLS -->
+
+    <div class="panel controls">
+
+      <div class="label-row">
+        <span>Your prompt</span>
+        <span id="counter">0 / 500</span>
+      </div>
+
+
+      <textarea
+        id="prompt"
+        maxlength="500"
+        placeholder="Example: A futuristic city floating above the clouds at sunset..."
+      ></textarea>
+
+
+      <div class="quick">
+
+        <button
+          data-prompt="A futuristic city floating above the clouds at sunset, cinematic lighting"
+        >
+          🌆 Cyber city
+        </button>
+
+        <button
+          data-prompt="A magical enchanted forest with glowing plants and tiny floating lights"
+        >
+          🌲 Fantasy
+        </button>
+
+        <button
+          data-prompt="A sleek futuristic sports car driving through neon Tokyo at night"
+        >
+          🏎️ Neon car
+        </button>
+
+        <button
+          data-prompt="A cozy cabin beside a frozen lake beneath the aurora borealis"
+        >
+          🌌 Aurora
+        </button>
+
+      </div>
+
+
+      <div class="settings">
+
+        <div>
+
+          <div class="label-row">
+            <span>Style</span>
+            <span>Quality</span>
+          </div>
+
+
+          <div class="settings-grid">
+
+            <select id="style">
+
+              <option value="cinematic">
+                Cinematic
+              </option>
+
+              <option value="photorealistic">
+                Photorealistic
+              </option>
+
+              <option value="digital-art">
+                Digital Art
+              </option>
+
+              <option value="anime">
+                Anime
+              </option>
+
+              <option value="oil-painting">
+                Oil Painting
+              </option>
+
+              <option value="3d-render">
+                3D Render
+              </option>
+
+            </select>
+
+
+            <select id="quality">
+
+              <option value="standard">
+                Standard
+              </option>
+
+              <option value="high">
+                High Quality
+              </option>
+
+              <option value="ultra">
+                Ultra Detail
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <div class="label-row">
+            <span>Aspect ratio</span>
+          </div>
+
+
+          <div class="ratios">
+
+            <button
+              class="ratio active"
+              data-ratio="1:1"
+            >
+              <span class="ratio-shape square"></span>
+              1:1
+            </button>
+
+
+            <button
+              class="ratio"
+              data-ratio="16:9"
+            >
+              <span class="ratio-shape wide"></span>
+              16:9
+            </button>
+
+
+            <button
+              class="ratio"
+              data-ratio="9:16"
+            >
+              <span class="ratio-shape tall"></span>
+              9:16
+            </button>
+
+
+            <button
+              class="ratio"
+              data-ratio="21:9"
+            >
+              <span class="ratio-shape ultrawide"></span>
+              21:9
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="generate"
+        id="generate"
+      >
+        ✨ Generate Image
+      </button>
+
+    </div>
+
+
+    <!-- PREVIEW -->
+
+    <div class="panel preview">
+
+      <div class="preview-header">
+
+        <h2>
+          Preview
+        </h2>
+
+        <div class="status">
+
+          <span
+            class="status-dot"
+            id="statusDot"
+          ></span>
+
+          <span id="status">
+            Ready
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="canvas"
+        id="canvas"
+      >
+
+        <div
+          class="empty"
+          id="empty"
+        >
+
+          <div class="empty-icon">
+            ✦
+          </div>
+
+          <h3>
+            Your creation will appear here
+          </h3>
+
+          <p>
+            Enter a prompt and press
+            Generate Image.
+          </p>
+
+        </div>
+
+
+        <div
+          class="loader"
+          id="loader"
+        >
+
+          <div class="loader-circle"></div>
+
+          <h3>
+            Creating your image...
+          </h3>
+
+          <p>
+            This may take a little while.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- GALLERY -->
+
+  <section class="gallery-section">
+
+    <div class="section-title">
+
+      <h2>
+        Your creations
+      </h2>
+
+      <p>
+        Your recent generated images are saved
+        in this browser.
+      </p>
+
+    </div>
+
+
+    <div
+      class="gallery"
+      id="gallery"
+    ></div>
+
+  </section>
+
+</main>
+
+
+<footer>
+  Nova AI · Built for creative exploration
+</footer>
+
+
+<div
+  class="toast"
+  id="toast"
+></div>
+
+
+<script>
+
+  const promptInput =
+    document.getElementById("prompt");
+
+  const counter =
+    document.getElementById("counter");
+
+  const generateButton =
+    document.getElementById("generate");
+
+  const canvas =
+    document.getElementById("canvas");
+
+  const empty =
+    document.getElementById("empty");
+
+  const loader =
+    document.getElementById("loader");
+
+  const status =
+    document.getElementById("status");
+
+  const statusDot =
+    document.getElementById("statusDot");
+
+  const galleryElement =
+    document.getElementById("gallery");
+
+  const toast =
+    document.getElementById("toast");
+
+
+  /* --------------------------------
+     PROMPT COUNTER
+  -------------------------------- */
+
+  promptInput.addEventListener(
+    "input",
+    () => {
+
+      counter.textContent =
+        `${promptInput.value.length} / 500`;
+
+    }
+  );
+
+
+  /* --------------------------------
+     QUICK PROMPTS
+  -------------------------------- */
+
+  document
+    .querySelectorAll(".quick button")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          promptInput.value =
+            button.dataset.prompt;
+
+          promptInput.dispatchEvent(
+            new Event("input")
+          );
+
+        }
+      );
+
+    });
+
+
+  /* --------------------------------
+     ASPECT RATIOS
+  -------------------------------- */
+
+  document
+    .querySelectorAll(".ratio")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(".r
